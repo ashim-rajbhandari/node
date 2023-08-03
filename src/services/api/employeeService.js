@@ -7,7 +7,7 @@ class EmployeeService {
   async getAll(query) {
     try {
       const options = {
-        attributes: ["id", "first_name"  , "username"],
+        attributes: ["id", "first_name","last_name", "username" , "email"],
         page: query.page || 1, // Default 1
         paginate: query.perPage || 1, // Default 25
         order: [["created_at", "DESC"]],

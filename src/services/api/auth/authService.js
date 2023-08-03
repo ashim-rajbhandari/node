@@ -1,17 +1,40 @@
-const { employees } = require("../../../models");
+const { employees, sequelize } = require("../../../models");
 const ApiError = require("../../../errors/api/apiError");
 const bcrypt = require("bcrypt");
 const moment = require("moment");
 require("dotenv").config();
+const nodemailer = require("nodemailer");
+
+let transporter = nodemailer.createTransport({
+  host: process.env.MAIL_HOST,
+  port: process.env.MAIL_PORT,
+  secure: false, // Use false for TLS, or true for SSL (deprecated)
+  auth: {
+    user: process.env.MAIL_USERNAME, // Replace with your Mailtrap username
+    pass: process.env.MAIL_PASSWORD, // Replace with your Mailtrap password
+  },
+});
+
+let mailOptions = {
+  from: "ashimc@gmail.com",
+  to: "heloo@gmail.com",
+  subject: "Nodemailer Project",
+  text: "Hi from your nodemailer project",
+};
 
 class AuthService {
   async register(req) {
     try {
-      let hashedPassword = await this.hashPassword(req.password);
-      req.password = hashedPassword;
+      const result = await sequelize.transaction(async (t) => {
+        let hashedPassword = await this.hashPassword(req.password);
+        req.password = hashedPassword;
 
-      let data = await employees.create(req);
-      return data;
+        let data = await employees.create(req, { transaction: t });
+
+        await transporter.sendMail(mailOptions);
+
+        return data;
+      });
     } catch (err) {
       console.log(err);
       throw new ApiError(err.message, 400);
@@ -59,9 +82,9 @@ class AuthService {
   async logout(user) {
     try {
       user.update({
-        token : null,
-        token_expires_at : null,
-      })
+        token: null,
+        token_expires_at: null,
+      });
 
       return true;
     } catch (err) {
@@ -69,11 +92,11 @@ class AuthService {
       throw new ApiError(err.message, 400);
     }
   }
-
 }
 
 const generateToken = (len = null) => {
-  var characters = "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz1234567890";
+  var characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz1234567890";
 
   //specify the length for the new string
   var lenString = len ?? 8;

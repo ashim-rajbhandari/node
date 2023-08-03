@@ -28,7 +28,6 @@ class employeeController {
                 'pagination' : {
                     pages : data.pages,
                     total : data.total,
-                    nextUrl : process.env.APP_URL+'/employees?pages='+(1)+'&perPage='+data.perPage,
                 }
             },
             'data' : value
