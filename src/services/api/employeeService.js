@@ -1,16 +1,35 @@
 const { employees } = require("../../models");
 const ApiError = require("../../errors/api/apiError");
-const sequelize = require("sequelize");
+const { sequelize , Op } = require("sequelize");
 const fs = require('fs');
 
 class EmployeeService {
   async getAll(query) {
     try {
+      
+      const where = {};
+      if (query.firstName) {
+        where.first_name = {
+          [Op.iLike]: `%${query.firstName}%`,
+        };
+      }
+      if (query.lastName) {
+        where.last_name = {
+          [Op.iLike]: `%${query.lastName}%`,
+        };
+      }
+      if (query.username) {
+        where.username = {
+          [Op.iLike]: `%${query.username}%`,
+        };
+      }
+
       const options = {
         attributes: ["id", "first_name","last_name", "username" , "email"],
         page: query.page || 1, // Default 1
         paginate: query.perPage || 1, // Default 25
         order: [["created_at", "DESC"]],
+        where,
       };
 
       const { docs, pages, total } = await employees.paginate(options);
