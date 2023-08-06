@@ -3,24 +3,8 @@ const ApiError = require("../../../errors/api/apiError");
 const bcrypt = require("bcrypt");
 const moment = require("moment");
 require("dotenv").config();
-const nodemailer = require("nodemailer");
+const { emitter } = require('../../../listeners/createAccountListener');
 
-let transporter = nodemailer.createTransport({
-  host: process.env.MAIL_HOST,
-  port: process.env.MAIL_PORT,
-  secure: false, // Use false for TLS, or true for SSL (deprecated)
-  auth: {
-    user: process.env.MAIL_USERNAME, // Replace with your Mailtrap username
-    pass: process.env.MAIL_PASSWORD, // Replace with your Mailtrap password
-  },
-});
-
-let mailOptions = {
-  from: "ashimc@gmail.com",
-  to: "heloo@gmail.com",
-  subject: "Nodemailer Project",
-  text: "Hi from your nodemailer project",
-};
 
 class AuthService {
   async register(req) {
@@ -31,7 +15,7 @@ class AuthService {
 
         let data = await employees.create(req, { transaction: t });
 
-        await transporter.sendMail(mailOptions);
+        emitter.emit('send');
 
         return data;
       });
