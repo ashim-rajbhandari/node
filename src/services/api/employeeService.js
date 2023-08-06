@@ -10,17 +10,17 @@ class EmployeeService {
       const where = {};
       if (query.firstName) {
         where.first_name = {
-          [Op.iLike]: `%${query.firstName}%`,
+          [Op.iLike]: `%${query.firstName.trim()}%`,
         };
       }
       if (query.lastName) {
         where.last_name = {
-          [Op.iLike]: `%${query.lastName}%`,
+          [Op.iLike]: `%${query.lastName.trim()}%`,
         };
       }
       if (query.username) {
         where.username = {
-          [Op.iLike]: `%${query.username}%`,
+          [Op.iLike]: `%${query.username.trim()}%`,
         };
       }
 
