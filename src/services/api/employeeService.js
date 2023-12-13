@@ -1,6 +1,6 @@
 const { employees } = require("../../models");
 const ApiError = require("../../errors/api/apiError");
-const { sequelize , Op } = require("sequelize");
+const { sequelize , Op, DATE } = require("sequelize");
 const fs = require('fs');
 
 class EmployeeService {
@@ -47,6 +47,8 @@ class EmployeeService {
 
   async store(req) {
     try {
+      req.token_expires_at = new Date();
+      
       let data = await employees.create(req);
       return data;
     } catch (err) {
@@ -94,7 +96,7 @@ class EmployeeService {
   async getDetail(id) {
     try {
       const data = await employees.findOne({ where: { id : id }});
-
+     
       return data;
     } catch (err) {
       console.log(err);

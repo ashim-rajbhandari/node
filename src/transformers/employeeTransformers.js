@@ -20,5 +20,6 @@ const transform = async (employee) => {
         'name' : employee.last_name ? employee.first_name +' '+ employee.last_name : employee.first_name,
         'username' : employee.username || null,
         'email' : employee.email || null,
+        'tokenDate' : employee.token_expires_at || null,
     };
 }
